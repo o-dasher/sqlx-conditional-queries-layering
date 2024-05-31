@@ -64,7 +64,7 @@ macro_rules! create_conditional_query_as {
             };
         }
 
-        paste! {
+        paste::paste! {
             #[allow(unused_macros)]
             macro_rules! [<feed_query_ $name>] {
                 ($feed_dollar:tt, $feed_name:tt, $dollar($feed_conditionals:tt)*) => {

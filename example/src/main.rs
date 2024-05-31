@@ -1,5 +1,4 @@
 use dotenvy::dotenv;
-use paste::paste;
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 use sqlx::{pool::PoolOptions, types::BigDecimal, Postgres};
