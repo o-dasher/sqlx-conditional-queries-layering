@@ -10,8 +10,7 @@
 ///     .unwrap_or_default();
 ///
 /// sqlx_conditional_queries_layering::create_conditional_query_as!(
-///     $,
-///     keehee_query,
+///     $keehee_query,
 ///     #keehee = match keehee {
 ///         Keehee::OwO => "owo",
 ///         Keehee::UmU => "umu",
@@ -33,8 +32,7 @@
 /// conditional queries on top of another existing query template.
 /// ```
 /// feed_query_keehee_query!(
-///     $,
-///     super_duper_query,
+///     $super_duper_query,
 ///     #oi = match something {
 ///         Something::Oi => "dumb"
 ///         Something::Nah => "cool"
@@ -52,7 +50,8 @@
 /// - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
 #[macro_export]
 macro_rules! create_conditional_query_as {
-    (gen $name:tt, $dollar:tt, $($conditional_part:tt)*) => {
+    (@$dollar:tt$name:tt, $($conditional_part:tt)*) => {
+        #[allow(unused_macros)]
         macro_rules! $name {
             ($type:ty, $query:expr $dollar(, $dollar($more_conditionals:tt)*)?) => {
                 sqlx_conditional_queries::conditional_query_as!(
@@ -67,10 +66,9 @@ macro_rules! create_conditional_query_as {
         paste::paste! {
             #[allow(unused_macros)]
             macro_rules! [<feed_query_ $name>] {
-                ($feed_dollar:tt, $feed_name:tt, $dollar($feed_conditionals:tt)*) => {
+                ($feed_dollar:tt$feed_name:tt, $dollar($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
-                        gen $feed_name,
-                        $feed_dollar,
+                        @$feed_dollar$feed_name,
                         $($conditional_part)*,
                         $dollar($feed_conditionals)*
                     )
@@ -79,7 +77,7 @@ macro_rules! create_conditional_query_as {
         }
     };
 
-    ($dollar:tt, $name:tt, $($conditional_part:tt)*) => {
-        sqlx_conditional_queries_layering::create_conditional_query_as!(gen $name, $dollar, $($conditional_part)*)
+    ($dollar:tt$name:tt, $($conditional_part:tt)*) => {
+        sqlx_conditional_queries_layering::create_conditional_query_as!(@$dollar$name, $($conditional_part)*)
     };
 }

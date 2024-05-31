@@ -41,8 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     let keehee = keehoo();
 
     sqlx_conditional_queries_layering::create_conditional_query_as!(
-        $,
-        _keehee_query,
+        $keehee_query,
         #keehee = match keehaa {
             Keehee::OwO => "owo",
             Keehee::UmU => "umu",
@@ -50,9 +49,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         }
     );
 
-    feed_query__keehee_query!(
-        $,
-        lewdy,
+    feed_query_keehee_query!(
+        $lewdy,
         #lewdiness = match keehee {
             Keehee::OwO => "owo",
             Keehee::UmU => "umu",

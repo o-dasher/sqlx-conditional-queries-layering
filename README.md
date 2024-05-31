@@ -11,8 +11,7 @@ let keehee = [Keehee::OwO, Keehee::UmU, Keehee::UwU]
     .unwrap_or_default();
 
 create_conditional_query_as!(
-    $,
-    keehee_query,
+    $keehee_query,
     #keehee = match keehee {
         Keehee::OwO => "owo",
         Keehee::UmU => "umu",
@@ -37,8 +36,7 @@ keehee_query!(BigID, "DO YOUR QUERY", #hey=match {...})
 
 ```rust
 feed_query_keehee_query!(
-    $,
-    super_duper_query,
+    $super_duper_query,
     #oi = match something {
         Something::Oi => "dumb",
         Something::Nah => "cool"
