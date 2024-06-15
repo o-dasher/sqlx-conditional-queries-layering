@@ -52,6 +52,10 @@
 ///
 /// # See Also
 /// - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
+///
+/// Although it would be nice to be able to use the query on multiple files,
+/// this unfortunately does not seem to be possible the way rust is structured.
+/// https://doc.rust-lang.org/stable/nightly-rustc/rustc_lint/builtin/static.MACRO_EXPANDED_MACRO_EXPORTS_ACCESSED_BY_ABSOLUTE_PATHS.html
 #[macro_export]
 macro_rules! create_conditional_query_as {
     (($($macro_header:tt)*) @ $name:tt, $($conditional_part:tt)*) => {
@@ -98,13 +102,4 @@ macro_rules! create_conditional_query_as {
             (#[allow(unused_macros)]) @ $name, $($conditional_part)*
         );
     };
-
-    (export $name:tt, $($conditional_part:tt)*) => {
-        sqlx_conditional_queries_layering::create_conditional_query_as!(
-            (
-                #[allow(unused_macros)]
-                #[macro_export]
-            ) @ $name, $($conditional_part)*
-        );
-    }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "sqlx-conditional-queries-layering"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 repository = "https://github.com/o-dasher/sqlx-conditional-queries-layering.git"
 description = "Query templating for sqlx-conditional-queries."
