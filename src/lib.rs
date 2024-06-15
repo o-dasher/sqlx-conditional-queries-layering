@@ -54,8 +54,8 @@
 /// - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
 #[macro_export]
 macro_rules! create_conditional_query_as {
-    ($name:tt, $($conditional_part:tt)*) => {
-        #[allow(unused_macros)]
+    (($($macro_header:tt)*) @ $name:tt, $($conditional_part:tt)*) => {
+        $($macro_header)*
         macro_rules! $name {
             ($type:ty, $query:expr $$(, $$($more_conditionals:tt)*)?) => {
                 sqlx_conditional_queries::conditional_query_as!(
@@ -68,7 +68,7 @@ macro_rules! create_conditional_query_as {
         }
 
         with_builtin_macros::with_eager_expansions! {
-            #[allow(unused_macros)]
+            $($macro_header)*
             macro_rules! #{concat_idents!(feed_, $name)} {
                 ($feed_name:tt, $$($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
@@ -79,7 +79,7 @@ macro_rules! create_conditional_query_as {
                 };
             }
 
-            #[allow(unused_macros)]
+            $($macro_header)*
             macro_rules! #{concat_idents!($name, _feed_existing_query)} {
                 ($existing_query:ident, $feed_name:tt) => {
                     paste::paste! {
@@ -92,4 +92,19 @@ macro_rules! create_conditional_query_as {
             }
         }
     };
+
+    ($name:tt, $($conditional_part:tt)*) => {
+        sqlx_conditional_queries_layering::create_conditional_query_as!(
+            (#[allow(unused_macros)]) @ $name, $($conditional_part)*
+        )
+    };
+
+    (export $name:tt, $($conditional_part:tt)*) => {
+        sqlx_conditional_queries_layering::create_conditional_query_as!(
+            (
+                #[allow(unused_macros)]
+                #[macro_export]
+            ) @ $name, $($conditional_part)*
+        )
+    }
 }

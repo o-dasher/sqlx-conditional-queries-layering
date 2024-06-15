@@ -1113,7 +1113,7 @@ dependencies = [
 
 [[package]]
 name = "sqlx-conditional-queries-layering"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "with_builtin_macros",
 ]
