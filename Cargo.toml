@@ -8,3 +8,6 @@ license = "MIT"
 
 [workspace]
 members = ["example"]
+
+[dependencies]
+with_builtin_macros = "0.1.0"

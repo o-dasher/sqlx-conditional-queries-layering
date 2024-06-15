@@ -54,7 +54,7 @@
 /// - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
 #[macro_export]
 macro_rules! create_conditional_query_as {
-    (@$name:tt, $($conditional_part:tt)*) => {
+    ($name:tt, $($conditional_part:tt)*) => {
         #[allow(unused_macros)]
         macro_rules! $name {
             ($type:ty, $query:expr $$(, $$($more_conditionals:tt)*)?) => {
@@ -67,12 +67,12 @@ macro_rules! create_conditional_query_as {
             };
         }
 
-        paste::paste! {
+        with_builtin_macros::with_eager_expansions! {
             #[allow(unused_macros)]
-            macro_rules! [<feed_ $name>] {
+            macro_rules! #{concat_idents!(feed_, $name)} {
                 ($feed_name:tt, $$($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
-                        @$feed_name,
+                        $feed_name,
                         $($conditional_part)*,
                         $$($feed_conditionals)*
                     );
@@ -80,18 +80,16 @@ macro_rules! create_conditional_query_as {
             }
 
             #[allow(unused_macros)]
-            macro_rules! [<$name _feed_existing_query>] {
-                ($existing_feed_query:ident, $feed_name:tt) => {
-                    $existing_feed_query!(
-                        $feed_name,
-                        $($conditional_part)*
-                    );
+            macro_rules! #{concat_idents!($name, _feed_existing_query)} {
+                ($existing_query:ident, $feed_name:tt) => {
+                    paste::paste! {
+                        [<feed_ $existing_query>]!(
+                            $feed_name,
+                            $($conditional_part)*
+                        );
+                    }
                 }
             }
         }
-    };
-
-    ($name:tt, $($conditional_part:tt)*) => {
-        sqlx_conditional_queries_layering::create_conditional_query_as!(@$name, $($conditional_part)*);
     };
 }

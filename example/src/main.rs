@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         }
     );
 
-    lewdy_feed_existing_query!(feed_keehee_query, argsception);
+    lewdy_feed_existing_query!(keehee_query, argsception);
 
     // Using feed_existing_query we can provide query conditionals to already
     // existing conditional queries.
