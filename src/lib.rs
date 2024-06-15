@@ -1,16 +1,20 @@
+#![feature(macro_metavar_expr)]
+
 /// Macro to handle query templates for the sqlx-conditional-queries library.
 ///
 /// # Examples
 ///
+/// We need to enable macro_metavar_expr unstable feature
 /// Basic usage:
 /// ```
+/// #![feature(macro_metavar_expr)]
 /// let keehee = [Keehee::OwO, Keehee::UmU, Keehee::UwU]
 ///     .choose(&mut rand::thread_rng())
 ///     .cloned()
 ///     .unwrap_or_default();
 ///
 /// sqlx_conditional_queries_layering::create_conditional_query_as!(
-///     $keehee_query,
+///     keehee_query,
 ///     #keehee = match keehee {
 ///         Keehee::OwO => "owo",
 ///         Keehee::UmU => "umu",
@@ -32,7 +36,7 @@
 /// conditional queries on top of another existing query template.
 /// ```
 /// feed_query_keehee_query!(
-///     $super_duper_query,
+///     super_duper_query,
 ///     #oi = match something {
 ///         Something::Oi => "dumb"
 ///         Something::Nah => "cool"
@@ -50,34 +54,44 @@
 /// - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
 #[macro_export]
 macro_rules! create_conditional_query_as {
-    (@$dollar:tt$name:tt, $($conditional_part:tt)*) => {
+    (@$name:tt, $($conditional_part:tt)*) => {
         #[allow(unused_macros)]
         macro_rules! $name {
-            ($type:ty, $query:expr $dollar(, $dollar($more_conditionals:tt)*)?) => {
+            ($type:ty, $query:expr $$(, $$($more_conditionals:tt)*)?) => {
                 sqlx_conditional_queries::conditional_query_as!(
                     $type,
                     $query,
                     $($conditional_part)*
-                    $dollar(, $dollar($more_conditionals)*)?
+                    $$(, $$($more_conditionals)*)?
                 )
             };
         }
 
         paste::paste! {
             #[allow(unused_macros)]
-            macro_rules! [<feed_query_ $name>] {
-                ($feed_dollar:tt$feed_name:tt, $dollar($feed_conditionals:tt)*) => {
+            macro_rules! [<feed_ $name>] {
+                ($feed_name:tt, $$($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
-                        @$feed_dollar$feed_name,
+                        @$feed_name,
                         $($conditional_part)*,
-                        $dollar($feed_conditionals)*
+                        $$($feed_conditionals)*
                     )
                 };
+            }
+
+            #[allow(unused_macros)]
+            macro_rules! [<$name _feed_existing_query>] {
+                ($existing_feed_query:ident, $feed_name:tt) => {
+                    $existing_feed_query!(
+                        $feed_name,
+                        $($conditional_part)*
+                    )
+                }
             }
         }
     };
 
-    ($dollar:tt$name:tt, $($conditional_part:tt)*) => {
-        sqlx_conditional_queries_layering::create_conditional_query_as!(@$dollar$name, $($conditional_part)*)
+    ($name:tt, $($conditional_part:tt)*) => {
+        sqlx_conditional_queries_layering::create_conditional_query_as!(@$name, $($conditional_part)*)
     };
 }

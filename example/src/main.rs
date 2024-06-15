@@ -1,3 +1,5 @@
+#![feature(macro_metavar_expr)]
+
 use dotenvy::dotenv;
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
@@ -41,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     let keehee = keehoo();
 
     sqlx_conditional_queries_layering::create_conditional_query_as!(
-        $keehee_query,
+        keehee_query,
         #keehee = match keehaa {
             Keehee::OwO => "owo",
             Keehee::UmU => "umu",
@@ -49,8 +51,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         }
     );
 
-    feed_query_keehee_query!(
-        $lewdy,
+    feed_keehee_query!(
+        lewdy,
         #lewdiness = match keehee {
             Keehee::OwO => "owo",
             Keehee::UmU => "umu",
@@ -58,7 +60,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         }
     );
 
-    let result = lewdy!(BigID, "INSERT INTO {#keehee} DEFAULT VALUES RETURNING id",)
+    lewdy_feed_existing_query!(feed_keehee_query, argsception);
+
+    // Using feed_existing_query we can provide query conditionals to already
+    // existing conditional queries.
+    let _ = argsception!(BigID, "INSERT INTO {#keehee} DEFAULT VALUES RETURNING id")
+        .fetch_one(&pool)
+        .await;
+
+    let result = lewdy!(BigID, "INSERT INTO {#keehee} DEFAULT VALUES RETURNING id")
         .fetch_one(&pool)
         .await;
 
