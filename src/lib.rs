@@ -75,7 +75,7 @@ macro_rules! create_conditional_query_as {
                         @$feed_name,
                         $($conditional_part)*,
                         $$($feed_conditionals)*
-                    )
+                    );
                 };
             }
 
@@ -85,13 +85,13 @@ macro_rules! create_conditional_query_as {
                     $existing_feed_query!(
                         $feed_name,
                         $($conditional_part)*
-                    )
+                    );
                 }
             }
         }
     };
 
     ($name:tt, $($conditional_part:tt)*) => {
-        sqlx_conditional_queries_layering::create_conditional_query_as!(@$name, $($conditional_part)*)
+        sqlx_conditional_queries_layering::create_conditional_query_as!(@$name, $($conditional_part)*);
     };
 }
