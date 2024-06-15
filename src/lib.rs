@@ -96,7 +96,7 @@ macro_rules! create_conditional_query_as {
     ($name:tt, $($conditional_part:tt)*) => {
         sqlx_conditional_queries_layering::create_conditional_query_as!(
             (#[allow(unused_macros)]) @ $name, $($conditional_part)*
-        )
+        );
     };
 
     (export $name:tt, $($conditional_part:tt)*) => {
@@ -105,6 +105,6 @@ macro_rules! create_conditional_query_as {
                 #[allow(unused_macros)]
                 #[macro_export]
             ) @ $name, $($conditional_part)*
-        )
+        );
     }
 }
