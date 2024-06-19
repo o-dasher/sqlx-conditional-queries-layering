@@ -71,9 +71,9 @@ macro_rules! create_conditional_query_as {
             };
         }
 
-        with_builtin_macros::with_eager_expansions! {
+        paste::paste! {
             #[allow(unused_macros)]
-            macro_rules! #{concat_idents!(_DO_NOT_USE_EXPLICITLY, _, $name)} {
+            macro_rules! [<_DO_NOT_USE_EXPLICITLY_ $name>] {
                 ($feed_name:tt, $$($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
                         $feed_name,
@@ -84,7 +84,7 @@ macro_rules! create_conditional_query_as {
             }
 
             #[allow(unused_macros)]
-            macro_rules! #{concat_idents!(_, $name, _DO_NOT_USE_EXPLICITLY)} {
+            macro_rules! [<_$name _DO_NOT_USE_EXPLICITLY>] {
                 ($existing_query:ident, $feed_name:tt) => {
                     $existing_query!(
                         $feed_name,
