@@ -58,8 +58,8 @@
 /// https://doc.rust-lang.org/stable/nightly-rustc/rustc_lint/builtin/static.MACRO_EXPANDED_MACRO_EXPORTS_ACCESSED_BY_ABSOLUTE_PATHS.html
 #[macro_export]
 macro_rules! create_conditional_query_as {
-    (($($macro_header:tt)*) @ $name:tt, $($conditional_part:tt)*) => {
-        $($macro_header)*
+    ($name:tt, $($conditional_part:tt)*) => {
+        #[allow(unused_macros)]
         macro_rules! $name {
             ($type:ty, $query:expr $$(, $$($more_conditionals:tt)*)?) => {
                 sqlx_conditional_queries::conditional_query_as!(
@@ -72,7 +72,7 @@ macro_rules! create_conditional_query_as {
         }
 
         with_builtin_macros::with_eager_expansions! {
-            $($macro_header)*
+            #[allow(unused_macros)]
             macro_rules! #{concat_idents!(feed_, $name)} {
                 ($feed_name:tt, $$($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
@@ -83,7 +83,7 @@ macro_rules! create_conditional_query_as {
                 };
             }
 
-            $($macro_header)*
+            #[allow(unused_macros)]
             macro_rules! #{concat_idents!($name, _feed_existing_query)} {
                 ($existing_query:ident, $feed_name:tt) => {
                     paste::paste! {
@@ -95,11 +95,5 @@ macro_rules! create_conditional_query_as {
                 }
             }
         }
-    };
-
-    ($name:tt, $($conditional_part:tt)*) => {
-        sqlx_conditional_queries_layering::create_conditional_query_as!(
-            (#[allow(unused_macros)]) @ $name, $($conditional_part)*
-        );
     };
 }
