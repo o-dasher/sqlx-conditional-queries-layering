@@ -20,11 +20,11 @@ create_conditional_query_as!(
 );
 ```
 
-This will generate two macros: `_keehee_query` and `feed_keehee_query`.
+This will generate an `keehee_query` macro.
 
-### Using Generated Macros
+### Using the generated query
 
-`_keehee_query` is a template. You can use it to do an sqlx query:
+`keehee_query` is a template. You can use it to do an sqlx query:
 
 ```rust
 keehee_query!(BigID, "DO YOUR QUERY", #hey=match {...})
@@ -32,24 +32,41 @@ keehee_query!(BigID, "DO YOUR QUERY", #hey=match {...})
     .await;
 ```
 
-`feed_YOUR_QUERY_NAME` is used to add more conditional queries to an existing template:
+We can further extend the template with aditional variables using the macro `supply_sql_variables_to_query_as`.
 
 ```rust
-feed_query_keehee_query!(
-    $super_duper_query,
-    #oi = match something {
-        Something::Oi => "dumb",
-        Something::Nah => "cool"
+supply_sql_variables_to_query_as!(
+    keehee_query as some_query,
+    #name = match Fall::Through {
+        _ => "{keehee_name}",
     }
 );
 ```
+In this example we create `some_query`, which is another macro that have the same template variables as `keehee_query` with the addition of `#name`.
 
-This will generate a macro for `keehee_query` with the additional `#oi` argument. You can continue adding more arguments recursively.
+### It does not stop here though!
+We can merge two queries into one through:
+```rs
+merge_sql_query_as!((a, b) as argsception);
+```
+This will merge all the template variables of `a` and `b` into a single `argsception` query!
 
 ## Note
 This macro relies on other macros from [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries).
 
-## See Also
+### Dependencies
+You need to enable the `macro_metavar_expr` feature to use this library:
+```rs
+#![feature(macro_metavar_expr)]
+```
+You will also need to add the following dependencies to `Cargo.toml`: `sqlx_conditional_queries`, `paste`.
+You can do so easily, through:
+```
+cargo add sqlx_conditional_queries
+cargo add paste
+```
+
+### See Also
 
 - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
 

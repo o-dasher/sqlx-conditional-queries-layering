@@ -25,13 +25,6 @@ struct DotenvConfig {
     pub database_url: String,
 }
 
-fn keehoo() -> Keehee {
-    [Keehee::OwO, Keehee::UmU, Keehee::UwU]
-        .choose(&mut rand::thread_rng())
-        .cloned()
-        .unwrap_or_default()
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     dotenv().ok();
@@ -42,11 +35,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         .connect(&config.database_url)
         .await?;
 
-    let keehaa = keehoo();
+    let keehee = [Keehee::OwO, Keehee::UmU, Keehee::UwU]
+        .choose(&mut rand::thread_rng())
+        .cloned()
+        .unwrap_or_default();
 
     sqlx_conditional_queries_layering::create_conditional_query_as!(
         keehee_query,
-        #keehee = match keehaa {
+        #keehee = match keehee {
             Keehee::OwO => "owo",
             Keehee::UmU => "umu",
             Keehee::UwU => "uwu"
