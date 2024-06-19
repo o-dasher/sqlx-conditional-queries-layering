@@ -4,6 +4,9 @@ use dotenvy::dotenv;
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 use sqlx::{pool::PoolOptions, types::BigDecimal, Postgres};
+use sqlx_conditional_queries_layering::{
+    merge_sql_query_as, supply_sql_variables_to_query_as, Fall,
+};
 
 #[derive(Clone, Copy, Default)]
 enum Keehee {
@@ -40,7 +43,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         .await?;
 
     let keehaa = keehoo();
-    let keehee = keehoo();
 
     sqlx_conditional_queries_layering::create_conditional_query_as!(
         keehee_query,
@@ -51,26 +53,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         }
     );
 
-    feed_keehee_query!(
-        lewdy,
-        #lewdiness = match keehee {
-            Keehee::OwO => "owo",
-            Keehee::UmU => "umu",
-            Keehee::UwU => "uwu"
+    let keehee_name = "cool";
+
+    // Here we are suppling the #name variable to the keehee_query
+    // and we aliase the resulting query to another query name
+    supply_sql_variables_to_query_as!(
+        keehee_query as lewdy_query,
+        #name = match Fall::Through {
+            _ => "{keehee_name}",
         }
     );
 
-    lewdy_feed_existing_query!(keehee_query, argsception);
+    // Do not do this lol, it is for the sake of an example!
+    sqlx_conditional_queries_layering::create_conditional_query_as!(
+        return_id_template,
+        #return_id = match Fall::Through {
+            _ => "RETURNING id"
+        }
+    );
 
-    // Using feed_existing_query we can provide query conditionals to already
-    // existing conditional queries.
-    let _ = argsception!(BigID, "INSERT INTO {#keehee} DEFAULT VALUES RETURNING id")
-        .fetch_one(&pool)
-        .await;
+    // We can merge existing query templates!
+    merge_sql_query_as!((lewdy_query, return_id_template) as argsception);
 
-    let result = lewdy!(BigID, "INSERT INTO {#keehee} DEFAULT VALUES RETURNING id")
-        .fetch_one(&pool)
-        .await;
+    let result = argsception!(
+        BigID,
+        "INSERT INTO {#keehee} (name) VALUES ({#name}) {#return_id}"
+    )
+    .fetch_one(&pool)
+    .await;
 
     match result {
         Ok(v) => {

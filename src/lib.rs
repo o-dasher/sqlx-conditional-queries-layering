@@ -73,7 +73,7 @@ macro_rules! create_conditional_query_as {
 
         with_builtin_macros::with_eager_expansions! {
             #[allow(unused_macros)]
-            macro_rules! #{concat_idents!(feed_, $name)} {
+            macro_rules! #{concat_idents!(_DO_NOT_USE_EXPLICITLY, _, $name)} {
                 ($feed_name:tt, $$($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
                         $feed_name,
@@ -84,16 +84,39 @@ macro_rules! create_conditional_query_as {
             }
 
             #[allow(unused_macros)]
-            macro_rules! #{concat_idents!($name, _feed_existing_query)} {
+            macro_rules! #{concat_idents!(_, $name, _DO_NOT_USE_EXPLICITLY)} {
                 ($existing_query:ident, $feed_name:tt) => {
-                    paste::paste! {
-                        [<feed_ $existing_query>]!(
-                            $feed_name,
-                            $($conditional_part)*
-                        );
-                    }
+                    $existing_query!(
+                        $feed_name,
+                        $($conditional_part)*
+                    );
                 }
             }
         }
     };
+}
+
+#[macro_export]
+macro_rules! supply_sql_variables_to_query_as {
+    ($query_macro:ident as $as:ident, $($conditional_part:tt)*) => {
+        paste::paste! {
+            [<_DO_NOT_USE_EXPLICITLY_ $query_macro>]!($as, $($conditional_part)*)
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! merge_sql_query_as {
+    (($a:ident, $b:ident) as $as:ident) => {
+        paste::paste! {
+            [<_ $a _DO_NOT_USE_EXPLICITLY>]!(
+                [<_DO_NOT_USE_EXPLICITLY_ $b>],
+                $as
+            )
+        }
+    };
+}
+
+pub enum Fall {
+    Through,
 }
