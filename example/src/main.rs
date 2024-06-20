@@ -72,6 +72,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     // merge_sql_query_as!((lewdy_query, return_id_query) as argsception);
     // or we can do just as below if both queries follow the "query" suffix.
     merge_sql_query_as!(lewdy, return_id);
+    // we can also merge multiple queries using this pattern:
+    // merge_sql_query_as!(lewdy, return_id, lewdy);
 
     let result = lewdy_with_return_id_query!(
         BigID,
