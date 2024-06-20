@@ -59,6 +59,18 @@ macro_rules! merge_sql_query_as {
             )
         }
     };
+
+    ($a:ident, $b:ident, $suffix:ident) => {
+        paste::paste! {
+            sqlx_conditional_queries_layering::merge_sql_query_as!(
+                ([<$a $suffix>], [<$b $suffix>]) as [<$a _with_ $b $suffix>]
+            )
+        }
+    };
+
+    ($a:ident, $b:ident) => {
+        sqlx_conditional_queries_layering::merge_sql_query_as!($a, $b, _query)
+    };
 }
 
 pub enum Fall {

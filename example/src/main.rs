@@ -4,9 +4,8 @@ use dotenvy::dotenv;
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 use sqlx::{pool::PoolOptions, types::BigDecimal, Postgres};
-use sqlx_conditional_queries_layering::{
-    merge_sql_query_as, supply_sql_variables_to_query_as, Fall,
-};
+use sqlx_conditional_queries_layering::Fall;
+use sqlx_conditional_queries_layering::{merge_sql_query_as, supply_sql_variables_to_query_as};
 
 #[derive(Clone, Copy, Default)]
 enum Keehee {
@@ -62,18 +61,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     // Do not do this lol, it is for the sake of an example!
     sqlx_conditional_queries_layering::create_conditional_query_as!(
-        return_id_template,
+        return_id_query,
         #return_id = match Fall::Through {
             _ => "RETURNING id"
         }
     );
 
     // We can merge existing query templates!
-    merge_sql_query_as!((lewdy_query, return_id_template) as argsception);
+    // with an explicit given name for the new merged query
+    // merge_sql_query_as!((lewdy_query, return_id_query) as argsception);
+    // or we can do just as below if both queries follow the "query" suffix.
+    merge_sql_query_as!(lewdy, return_id);
 
-    let result = argsception!(
+    let result = lewdy_with_return_id_query!(
         BigID,
-        "INSERT INTO {#keehee} (name) VALUES ({#name}) {#return_id}"
+        "INSERT INTO {#keehee} (name) VALUES ({#name}) {#return_id}",
     )
     .fetch_one(&pool)
     .await;
