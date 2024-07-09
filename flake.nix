@@ -32,6 +32,7 @@
               (with pkgs; [
                 nixfmt-rfc-style
                 sqlx-cli
+                cargo-expand
               ])
               ++ (with toolchain; [
                 clippy

@@ -1,16 +1,14 @@
-#![feature(macro_metavar_expr)]
-
 #[macro_export]
 macro_rules! create_conditional_query_as {
-    ($name:tt, $($conditional_part:tt)*) => {
+    ($dollar:tt$name:tt, $($conditional_part:tt)*) => {
         #[allow(unused_macros)]
         macro_rules! $name {
-            ($type:ty, $query:expr $$(, $$($more_conditionals:tt)*)?) => {
+            ($type:ty, $query:expr $dollar(, $dollar($more_conditionals:tt)*)?) => {
                 sqlx_conditional_queries::conditional_query_as!(
                     $type,
                     $query,
                     $($conditional_part)*
-                    $$(, $$($more_conditionals)*)?
+                    $dollar(, $dollar($more_conditionals)*)?
                 )
             };
         }
@@ -18,20 +16,20 @@ macro_rules! create_conditional_query_as {
         paste::paste! {
             #[allow(unused_macros)]
             macro_rules! [<_DO_NOT_USE_EXPLICITLY_ $name>] {
-                ($feed_name:tt, $$($feed_conditionals:tt)*) => {
+                ($inner_dollar:tt$feed_name:tt, $dollar($feed_conditionals:tt)*) => {
                     sqlx_conditional_queries_layering::create_conditional_query_as!(
-                        $feed_name,
+                        $inner_dollar$feed_name,
                         $($conditional_part)*,
-                        $$($feed_conditionals)*
+                        $dollar($feed_conditionals)*
                     );
                 };
             }
 
             #[allow(unused_macros)]
             macro_rules! [<_$name _DO_NOT_USE_EXPLICITLY>] {
-                ($existing_query:ident, $feed_name:tt) => {
+                ($inner_dollar:tt$existing_query:ident, $feed_name:tt) => {
                     $existing_query!(
-                        $feed_name,
+                        $inner_dollar$feed_name,
                         $($conditional_part)*
                     );
                 }
@@ -42,34 +40,34 @@ macro_rules! create_conditional_query_as {
 
 #[macro_export]
 macro_rules! supply_sql_variables_to_query_as {
-    ($query_macro:ident as $as:ident, $($conditional_part:tt)*) => {
+    ($dollar:tt$query_macro:ident as $as:ident, $($conditional_part:tt)*) => {
         paste::paste! {
-            [<_DO_NOT_USE_EXPLICITLY_ $query_macro>]!($as, $($conditional_part)*)
+            [<_DO_NOT_USE_EXPLICITLY_ $query_macro>]!($dollar$as, $($conditional_part)*)
         }
     };
 }
 
 #[macro_export]
 macro_rules! merge_sql_query_as {
-    (($a:ident, $b:ident) as $as:ident) => {
+    ($dollar:tt($a:ident, $b:ident) as $as:ident) => {
         paste::paste! {
             [<_ $a _DO_NOT_USE_EXPLICITLY>]!(
-                [<_DO_NOT_USE_EXPLICITLY_ $b>],
+                $dollar[<_DO_NOT_USE_EXPLICITLY_ $b>],
                 $as
             )
         }
     };
 
-    (@$suffix:ident, $a:ident, $b:ident) => {
+    ($dollar:tt@$suffix:ident, $a:ident, $b:ident) => {
         paste::paste! {
             sqlx_conditional_queries_layering::merge_sql_query_as!(
-                ([<$a $suffix>], [<$b $suffix>]) as [<$a _with_ $b $suffix>]
+                $dollar([<$a $suffix>], [<$b $suffix>]) as [<$a _with_ $b $suffix>]
             )
         }
     };
 
-    (@$suffix:ident, $a:ident, $b:ident $(, $c:ident)*) => {
-        sqlx_conditional_queries_layering::merge_sql_query_as!(@$suffix, $a, $b);
+    ($dollar:tt@$suffix:ident, $a:ident, $b:ident $(, $c:ident)*) => {
+        sqlx_conditional_queries_layering::merge_sql_query_as!($dollar@$suffix, $a, $b);
         paste::paste! {
             sqlx_conditional_queries_layering::merge_sql_query_as!(
                 @$suffix,
@@ -79,12 +77,12 @@ macro_rules! merge_sql_query_as {
         }
     };
 
-    ($a:ident, $b:ident) => {
-        sqlx_conditional_queries_layering::merge_sql_query_as!(@_query, $a, $b)
+    ($dollar:tt($a:ident, $b:ident)) => {
+        sqlx_conditional_queries_layering::merge_sql_query_as!($dollar@_query, $a, $b)
     };
 
-    ($a:ident, $b:ident $(, $c:ident)*) => {
-        sqlx_conditional_queries_layering::merge_sql_query_as!(@_query, $a, $b $(, $c)*)
+    ($dollar:tt($a:ident, $b:ident $(, $c:ident)*)) => {
+        sqlx_conditional_queries_layering::merge_sql_query_as!($dollar@_query, $a, $b $(, $c)*)
     }
 }
 

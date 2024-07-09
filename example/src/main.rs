@@ -1,5 +1,3 @@
-#![feature(macro_metavar_expr)]
-
 use dotenvy::dotenv;
 use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
@@ -40,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         .unwrap_or_default();
 
     sqlx_conditional_queries_layering::create_conditional_query_as!(
-        keehee_query,
+        $keehee_query,
         #keehee = match keehee {
             Keehee::OwO => "owo",
             Keehee::UmU => "umu",
@@ -53,7 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     // Here we are suppling the #name variable to the keehee_query
     // and we aliase the resulting query to another query name
     supply_sql_variables_to_query_as!(
-        keehee_query as lewdy_query,
+        $keehee_query as lewdy_query,
         #name = match Fall::Through {
             _ => "{keehee_name}",
         }
@@ -61,7 +59,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 
     // Do not do this lol, it is for the sake of an example!
     sqlx_conditional_queries_layering::create_conditional_query_as!(
-        return_id_query,
+        $return_id_query,
         #return_id = match Fall::Through {
             _ => "RETURNING id"
         }
@@ -71,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
     // with an explicit given name for the new merged query
     // merge_sql_query_as!((lewdy_query, return_id_query) as argsception);
     // or we can do just as below if both queries follow the "query" suffix.
-    merge_sql_query_as!(lewdy, return_id);
+    merge_sql_query_as!($(lewdy, return_id));
     // we can also merge multiple queries using this pattern:
     // merge_sql_query_as!(lewdy, return_id, lewdy);
 

@@ -36,31 +36,40 @@ We can further extend the template with aditional variables using the macro `sup
 
 ```rust
 supply_sql_variables_to_query_as!(
-    keehee_query as some_query,
+    $keehee_query as some_query,
     #name = match Fall::Through {
         _ => "{keehee_name}",
     }
 );
 ```
+
 In this example we create `some_query`, which is another macro that have the same template variables as `keehee_query` with the addition of `#name`.
 
 ### It does not stop here though!
+
 We can merge two queries into one through:
+
 ```rs
-merge_sql_query_as!((a, b) as argsception);
+merge_sql_query_as!($(a, b) as argsception);
 ```
+
 This will merge all the template variables of `a` and `b` into a single `argsception` query!
 
 ## Note
+
 This macro relies on other macros from [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries).
 
 ### Dependencies
+
 You need to enable the `macro_metavar_expr` feature to use this library:
+
 ```rs
 #![feature(macro_metavar_expr)]
 ```
+
 You will also need to add the following dependencies to `Cargo.toml`: `sqlx_conditional_queries`, `paste`.
 You can do so easily, through:
+
 ```
 cargo add sqlx_conditional_queries
 cargo add paste
@@ -69,4 +78,3 @@ cargo add paste
 ### See Also
 
 - [`sqlx_conditional_queries`](https://docs.rs/sqlx_conditional_queries)
-
